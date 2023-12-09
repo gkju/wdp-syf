@@ -155,10 +155,6 @@ class Urzad {
         int get_m() {
             return this->m;
         }
-        
-        Kolejka operator[](int i) const {
-            return this->okienka[i];
-        }
 
         Kolejka &operator[](int i) {
             return this->okienka[i];
@@ -247,7 +243,9 @@ bool find_dir(interesant *a, interesant *b) {
 }
 
 std::vector<interesant*> fast_track(interesant *in1, interesant *in2) {
-    auto &kolejka = urzad[in1->ostatnia_kolejka];
+    // jesli in1 albo in2 to konce kolejek to musimy je naprawic, ale mozemy to latwo wykryc patrzac na ostatnia kolejka
+    Kolejka &kolejka = urzad[in1->ostatnia_kolejka];
+    Kolejka &kolejka2 = urzad[in2->ostatnia_kolejka];
 
     if(in1 == in2) {
         przepnij(in1);
@@ -270,24 +268,27 @@ std::vector<interesant*> fast_track(interesant *in1, interesant *in2) {
     result.push_back(in2);
     auto sasiad_in1 = in1_dir ? in1->i2 : in1->i1;
     auto sasiad_in2 = in2_dir ? in2->i2 : in2->i1;
+    // jesli to jest null to in1 jest koncem i kolejka to referencja do jego kolejki
     if(!sasiad_in1) {
         (kolejka.head == in1 ? kolejka.head : kolejka.tail) = sasiad_in2;
     } else {
         (sasiad_in1->i1 == in1 ? sasiad_in1->i1 : sasiad_in1->i2) = sasiad_in2;
     }
-
+    // jesli to jest null to in2 jest koncem i kolejka2 to referencja do jego kolejki
     if(!sasiad_in2) {
-        (kolejka.head == in2 ? kolejka.head : kolejka.tail) = sasiad_in1;
+        (kolejka2.head == in2 ? kolejka2.head : kolejka2.tail) = sasiad_in1;
     } else {
         (sasiad_in2->i1 == in2 ? sasiad_in2->i1 : sasiad_in2->i2) = sasiad_in1;
     }
+
+    kolejka.fix_nums();
+    kolejka2.fix_nums();
 
     return result;
 }
 
 void naczelnik(int k) {
     auto &kolejka = urzad[k];
-    
     std::swap(kolejka.head, kolejka.tail);
 }
 

@@ -43,8 +43,8 @@ int main(int argc, char **argv) {
     
     
     // Zakresy można modyfikować aby generować duże/małe testy.
-    int m = randint(1, 50);
-    int q = randint(1, 50);
+    int m = randint(1, 100);
+    int q = randint(1, 100);
     
     debug("m = " << m << "\n" << flush);
     
@@ -101,7 +101,9 @@ int main(int argc, char **argv) {
                     assert(i == NULL);
                     debug("kolejka pusta\n" << flush);
                 } else {
-                    assert(i == daj_interesanta[kolejki[k][0]]);
+                    interesant* daj = daj_interesanta[kolejki[k][0]];
+                    printf("dostalem i%d mialo byc %d\n", numerek(i), numerek(daj));
+                    assert(i == daj);
                     debug("zdejmuje " << numerek(i) << " z kolejki " << k << "\n" << flush);
                     reverse(kolejki[k].begin(), kolejki[k].end());
                     kolejki[k].pop_back();

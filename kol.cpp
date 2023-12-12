@@ -5,6 +5,7 @@
 #include <random>
 #include "kol.h"
 
+// zwraca a jesli a != NULL, w przeciwnym przypadku b
 template<typename T>
 T coalesce(T a, T b) {
     return a ? a : b;
@@ -36,6 +37,7 @@ class Kolejka {
             return !head;
         }
 
+        // chcemy, aby końce trzymały referencje do swoich kolejek, to je naprawia po różnych operacjach
         void fix_nums() {
             if(head) {
                 head->ostatnia_kolejka = this->id;
@@ -104,6 +106,7 @@ class Kolejka {
             return old;
         }
 
+        // jeśli jakiś element został usunięty, to należy poinformować o tym kolejkę, aby mogła naprawić końce, które trzyma
         void register_remove(interesant& i) {
             if(this->head == &i) {
                 this->head = coalesce(this->head->i1, this->head->i2);
@@ -115,6 +118,7 @@ class Kolejka {
             fix_nums();
         }
 
+        // dokleja b do naszej kolejki
         void join(Kolejka &b) {
             if(!b.head || !b.tail) {
                 return;
@@ -137,6 +141,7 @@ class Kolejka {
 class Urzad {
     private:
         int m;
+        // licznik interesantów
         int counter = 0;
         std::vector<Kolejka> okienka;
     public:
@@ -242,6 +247,17 @@ bool find_dir(interesant *a, interesant *b) {
     return i1 == b;
 }
 
+// po fast tracku zmienia końce kolejki o ile to konieczne
+// sasiad to sasiad usunietgo in, drugi sasiad to odpowiednik sasiada dla drugiego konca usuwanego fragmentu
+void rectify_ends(Kolejka &kolejka, interesant *sasiad, interesant *drugi_sasiad, interesant *in) {
+    // jesli to jest null to in jest koncem i kolejka to referencja do jego kolejki
+    if(!sasiad) {
+        (kolejka.head == in ? kolejka.head : kolejka.tail) = drugi_sasiad;
+    } else {
+        (sasiad->i1 == in ? sasiad->i1 : sasiad->i2) = drugi_sasiad;
+    }
+}
+
 std::vector<interesant*> fast_track(interesant *in1, interesant *in2) {
     // jesli in1 albo in2 to konce kolejek to musimy je naprawic, ale mozemy to latwo wykryc patrzac na ostatnia kolejka
     Kolejka &kolejka = urzad[in1->ostatnia_kolejka];
@@ -268,18 +284,9 @@ std::vector<interesant*> fast_track(interesant *in1, interesant *in2) {
     result.push_back(in2);
     auto sasiad_in1 = in1_dir ? in1->i2 : in1->i1;
     auto sasiad_in2 = in2_dir ? in2->i2 : in2->i1;
-    // jesli to jest null to in1 jest koncem i kolejka to referencja do jego kolejki
-    if(!sasiad_in1) {
-        (kolejka.head == in1 ? kolejka.head : kolejka.tail) = sasiad_in2;
-    } else {
-        (sasiad_in1->i1 == in1 ? sasiad_in1->i1 : sasiad_in1->i2) = sasiad_in2;
-    }
-    // jesli to jest null to in2 jest koncem i kolejka2 to referencja do jego kolejki
-    if(!sasiad_in2) {
-        (kolejka2.head == in2 ? kolejka2.head : kolejka2.tail) = sasiad_in1;
-    } else {
-        (sasiad_in2->i1 == in2 ? sasiad_in2->i1 : sasiad_in2->i2) = sasiad_in1;
-    }
+    
+    rectify_ends(kolejka, sasiad_in1, sasiad_in2, in1);
+    rectify_ends(kolejka2, sasiad_in2, sasiad_in1, in2);
 
     kolejka.fix_nums();
     kolejka2.fix_nums();

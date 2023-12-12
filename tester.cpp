@@ -17,7 +17,7 @@ using namespace std;
 // Odkomentuj #undef DEBUG aby pozbyć się wypisywania kroków.
 
 #define DEBUG
-//#undef DEBUG
+#undef DEBUG
 
 #ifdef DEBUG
 #define debug(X) cout << X
@@ -43,8 +43,8 @@ int main(int argc, char **argv) {
     
     
     // Zakresy można modyfikować aby generować duże/małe testy.
-    int m = randint(1, 200);
-    int q = randint(1, 1000);
+    int m = randint(1, 400);
+    int q = randint(1, 2000);
     
     debug("m = " << m << "\n" << flush);
     
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
                     debug("kolejka pusta\n" << flush);
                 } else {
                     interesant* daj = daj_interesanta[kolejki[k][0]];
-                    printf("dostalem i%d mialo byc %d\n", numerek(i), numerek(daj));
+                    // printf("dostalem i%d mialo byc %d\n", numerek(i), numerek(daj));
                     assert(i == daj);
                     debug("zdejmuje " << numerek(i) << " z kolejki " << k << "\n" << flush);
                     reverse(kolejki[k].begin(), kolejki[k].end());
@@ -240,6 +240,7 @@ int main(int argc, char **argv) {
         }
     }
 
+    /*
     for(auto x : v) {
         printf("i%d ", numerek(x));
     }
@@ -248,7 +249,7 @@ int main(int argc, char **argv) {
     for(auto x : pozostali) {
         printf("i%d ", numerek(x));
     }
-    printf("--------------docelowi------------------\n");
+    printf("--------------docelowi------------------\n");*/
 
     assert(v == pozostali);
     
